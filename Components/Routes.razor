@@ -1,0 +1,16 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData"/>
+        <FocusOnNavigate RouteData="routeData" Selector="h1"/>
+    </Found>
+</Router>
+
+@code
+{
+    public static readonly Dictionary<string, string> NavItems = new()
+    {
+        {"Calendar", "/calendar"},
+        {"Upcoming", "/calendar/upcoming"}
+    };
+}

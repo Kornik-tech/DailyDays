@@ -1,0 +1,83 @@
+﻿@page "/Calendar"
+
+<PageTitle>Calendar</PageTitle>
+
+<div class="text-center text-3xl font-bold mt-4">
+    @CurrentDate.ToString("MMMM yyyy")
+</div>
+<div class="grid grid-cols-7 gap-5 py-4 px-64 flex-1 auto-rows-[1fr]">
+    @foreach (var cell in GetCalendarCells())
+    {
+        @if (cell.IsCurrentMonth)
+        {
+            <div class="p-4 shadow rounded hover:bg-hover cursor-pointer transition-colors @(cell.IsWeekend ? "bg-secondary" : "bg-surface")">
+                @cell.Day
+            </div>
+        }
+        else
+        {
+            <div class="p-4 shadow rounded bg-surface opacity-50 text-gray-500 cursor-default">
+                @cell.Day
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private DateTime CurrentDate { get; } = DateTime.Now;
+    public record CalendarCell(int Day, bool IsWeekend, bool IsCurrentMonth);
+
+    private List<CalendarCell> GetCalendarCells()
+    {
+        var date = CurrentDate;
+        var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+        var daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+
+        var cells = new List<CalendarCell>();
+
+        var startOffset = (int)firstDayOfMonth.DayOfWeek - 1;
+        if (startOffset < 0) startOffset = 6;
+
+        var prevMonth = firstDayOfMonth.AddMonths(-1);
+        var daysInPrevMonth = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
+
+        for (var i = startOffset - 1; i >= 0; i--)
+        {
+            var day = daysInPrevMonth - i;
+            var prevDate = new DateTime(prevMonth.Year, prevMonth.Month, day);
+            var isWeekend = prevDate.DayOfWeek == DayOfWeek.Saturday || prevDate.DayOfWeek == DayOfWeek.Sunday;
+
+            cells.Add(new CalendarCell(day, isWeekend, false));
+        }
+
+        for (var i = 1; i <= daysInMonth; i++)
+        {
+            var currentDate = new DateTime(date.Year, date.Month, i);
+            var isWeekend = currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday;
+
+            cells.Add(new CalendarCell(i, isWeekend, true));
+        }
+
+        var remainingCells = cells.Count % 7;
+        if (remainingCells > 0)
+        {
+            var cellsToFill = 7 - remainingCells;
+            var nextMonth = firstDayOfMonth.AddMonths(1);
+
+            for (var i = 1; i <= cellsToFill; i++)
+            {
+                var nextDate = new DateTime(nextMonth.Year, nextMonth.Month, i);
+                var isWeekend = nextDate.DayOfWeek == DayOfWeek.Saturday || nextDate.DayOfWeek == DayOfWeek.Sunday;
+
+                cells.Add(new CalendarCell(i, isWeekend, false));
+            }
+        }
+
+        return cells;
+    }
+
+    protected override void OnInitialized()
+    {
+
+    }
+}

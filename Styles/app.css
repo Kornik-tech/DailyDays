@@ -1,0 +1,36 @@
+﻿@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@tailwind utilities;
+
+:root {
+    --bg-color: #0D0D0D;
+    --text-color: #fff;
+    --primary-color: #00FF85;
+    --secondary-color: #1E90FF;
+    --hover-color: #FF0099;
+    --surface-color: #1A1A1A;
+}
+
+@theme {
+    --font-roboto: 'Roboto', sans-serif;
+    --font-archivo: "Archivo Black", sans-serif;
+    --color-primary: var(--primary-color);
+    --color-secondary: var(--secondary-color);
+    --color-hover: var(--hover-color);
+    --color-surface: var(--surface-color);
+}
+
+
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+}
+label, h1, h2, h3, h4, h5, h6, p, span {
+    color: var(--text-color);
+}
+
+.text-heading {
+    @apply font-bold tracking-widest;
+    font-family: var(--font-archivo), sans-serif;
+}

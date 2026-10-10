@@ -1,0 +1,60 @@
+﻿@page "/Signin"
+@using DailyDays.Data.DTOs
+@using DailyDays.Services
+@using Microsoft.AspNetCore.Authentication
+@inject IAuthService AuthService
+
+<PageTitle>Login</PageTitle>
+
+
+<EditForm Model="@Model" FormName="LoginForm" OnValidSubmit="Authenticate">
+    <DataAnnotationsValidator/>
+    <h3 class="text-heading text-3xl text-center">LOGIN</h3>
+
+    <div class="flex flex-col pt-4">
+        <label for="email">Email</label>
+        <InputText autocomplete="email" @bind-Value="Model.Email" type="email" id="email" class="border border-gray-400 bg-surface py-2 px-4"/>
+        <ValidationMessage For="() => Model.Email" />
+    </div>
+
+    <div class="flex flex-col py-4">
+        <label for="password">Password</label>
+        <InputText autocomplete="current-password" @bind-Value="Model.Password" type="password" id="password" class="border border-gray-400 py-2 px-4"/>
+        <ValidationMessage For="() => Model.Password" />
+    </div>
+
+    <div>
+        <span>@_errorMessage</span>
+    </div>
+    <div class="flex flex-col py-2">
+        <input type="submit" value="SUBMIT" class="text-heading text-surface bg-primary hover:text-white hover:bg-hover py-4 px-8 cursor-pointer transition-colors"/>
+    </div>
+</EditForm>
+
+@code {
+    [CascadingParameter] HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm] public SigninDto Model { get; set; } = default!;
+
+    private string? _errorMessage;
+
+    protected override void OnInitialized() => Model ??= new();
+
+
+    private async Task Authenticate()
+    {
+        if (Model is null || HttpContext is null)
+        {
+            _errorMessage = "Invalid request";
+            return;
+        }
+
+        var (principal, errorMessage) = await AuthService.SignIn(Model);
+        _errorMessage = errorMessage;
+        if (_errorMessage is null && principal is not null)
+        {
+            await HttpContext.SignInAsync(principal);
+            HttpContext.Response.Redirect("/");
+        }
+    }
+}
