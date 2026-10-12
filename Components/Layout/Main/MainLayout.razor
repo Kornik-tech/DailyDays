@@ -1,12 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
 <main class="min-h-screen flex flex-col">
-    <MainHeader/>
+    <MainHeaderComponent/>
+    @* <MudThemeProvider /> *@
+    @* <MudPopoverProvider /> *@
     <section class="flex-1 flex flex-col">
         @Body
     </section>
 </main>
 
-@code {
-    
-}

@@ -1,0 +1,49 @@
+﻿@page "/MainHeader"
+@inject NavigationManager NavigationManager
+
+<header class="p-4 w-full bg-surface flex flex-col md:flex-row justify-between md:items-center">
+    <div class=" w-36 sm:w-96">
+        <a href="/" class="flex items-center sm:items-end gap-2 sm:gap-4">
+            <img src="images/logo.png" alt="Logo" class="w-40 lg:w-52 h-auto hidden sm:block"/>
+            <img src="favicon.png" alt="Logo" class="w-10 h-auto sm:hidden"/>
+            <p class="font-bold text-xl sm:text-lg lg:text-xl pb-0.5 text-surface capitalize">
+                @if (_currentUrl.Length == 0)
+                {
+                    <span>DailyDays</span>
+                }
+                else
+                @_currentUrl.Split('/').First()
+            </p>
+        </a>
+    </div>
+
+    <div class="pt-4 md:p-0">
+        @if (_currentUrl.Length == 0)
+        {
+            <ul class="flex gap-4 justify-center md:justify-start">
+                <li><a href="/calendar" class="font-bold hover:text-hover transition-colors">Calendar</a></li>
+            </ul>
+        }
+        else
+        {
+            <MainHeaderUrlsComponent/>
+        }
+    </div>
+
+    <div class="w-36 flex justify-end items-center mr-1 md:w-10 lg:w-96 absolute md:static right-4 ">
+        <div class="w-8 fill-white hover:fill-secondary transition-colors cursor-pointer">
+            <MudIcon Icon="@Icons.Material.Filled.Dehaze"/>
+        </div>
+    </div>
+
+</header>
+
+@code {
+    private string _currentUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+    }
+
+}

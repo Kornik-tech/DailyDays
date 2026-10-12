@@ -11,4 +11,6 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Calendar> Calendars { get; set; }
+    public DbSet<Event> Events { get; set; }
 }

@@ -1,0 +1,29 @@
+﻿@inject NavigationManager NavigationManager
+
+<ul class="flex gap-4 justify-center md:justify-start">
+    @foreach (var item in Routes.NavItems)
+    {
+        if (_currentUrl.Split("/").Last().Contains(item.Value.Split('/').Last()))
+        {
+            <li>
+                <a class="font-bold text-secondary transition-colors">@item.Key</a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a href="@item.Value" class="font-bold hover:text-hover transition-colors">@item.Key</a>
+            </li>
+        }
+    }
+</ul>
+
+@code {
+    private string _currentUrl = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+    }
+
+}

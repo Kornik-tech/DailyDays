@@ -1,22 +1,27 @@
 ﻿@page "/Calendar"
+@rendermode InteractiveServer
 
 <PageTitle>Calendar</PageTitle>
 
-<div class="text-center text-3xl font-bold mt-4">
-    @CurrentDate.ToString("MMMM yyyy")
+<div class="flex items-center w-screen">
+    <div class="flex text-center justify-center text-xl sm:text-2xl w-full md:text-3xl font-bold mt-4 items-center gap-2">
+        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowLeft" Class="cursor-pointer w-10 md:w-14 fill-white hover:fill-hover transition-colors" @onclick="@(() => CurrentDate = CurrentDate.AddMonths(-1))" />
+        @(CurrentDate.ToString("MMMM yyyy")[0].ToString().ToUpper() + CurrentDate.ToString("MMMM yyyy")[1..])
+        <MudIcon Icon="@Icons.Material.Filled.KeyboardArrowRight" Class="cursor-pointer w-10 md:w-14 fill-white hover:fill-hover transition-colors" @onclick="@(() => CurrentDate = CurrentDate.AddMonths(1))" />
+    </div>
 </div>
-<div class="grid grid-cols-7 gap-5 py-4 px-64 flex-1 auto-rows-[1fr]">
+<div class="grid gap-2 sm:gap-5 py-4 flex-1 auto-rows-[1fr] px-4 sm:px-4 2xl:px-64 grid-cols-7 ">
     @foreach (var cell in GetCalendarCells())
     {
         @if (cell.IsCurrentMonth)
         {
-            <div class="p-4 shadow rounded hover:bg-hover cursor-pointer transition-colors @(cell.IsWeekend ? "bg-secondary" : "bg-surface")">
+            <div class="text-center sm:text-start py-4 sm:p-4 shadow rounded hover:bg-hover cursor-pointer transition-colors @(cell.IsToday ? "bg-primary text-surface hover:text-white font-bold" : (cell.IsWeekend ? "bg-secondary" : "bg-surface"))">
                 @cell.Day
             </div>
         }
         else
         {
-            <div class="p-4 shadow rounded bg-surface opacity-50 text-gray-500 cursor-default">
+            <div class="p-4 shadow rounded bg-surface opacity-50 text-gray-500 cursor-default @(cell.IsToday ? "border-2 border-blue-500" : "")">
                 @cell.Day
             </div>
         }
@@ -24,14 +29,16 @@
 </div>
 
 @code {
-    private DateTime CurrentDate { get; } = DateTime.Now;
-    public record CalendarCell(int Day, bool IsWeekend, bool IsCurrentMonth);
+    private DateTime CurrentDate { get; set; } = DateTime.Now;
+    public record CalendarCell(int Day, bool IsWeekend, bool IsCurrentMonth, bool IsToday);
 
     private List<CalendarCell> GetCalendarCells()
     {
         var date = CurrentDate;
         var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
         var daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+
+        var today = DateTime.Today;
 
         var cells = new List<CalendarCell>();
 
@@ -46,16 +53,18 @@
             var day = daysInPrevMonth - i;
             var prevDate = new DateTime(prevMonth.Year, prevMonth.Month, day);
             var isWeekend = prevDate.DayOfWeek == DayOfWeek.Saturday || prevDate.DayOfWeek == DayOfWeek.Sunday;
+            var isToday = prevDate.Date == today;
 
-            cells.Add(new CalendarCell(day, isWeekend, false));
+            cells.Add(new CalendarCell(day, isWeekend, false, isToday));
         }
 
         for (var i = 1; i <= daysInMonth; i++)
         {
             var currentDate = new DateTime(date.Year, date.Month, i);
             var isWeekend = currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday;
+            var isToday = currentDate.Date == today;
 
-            cells.Add(new CalendarCell(i, isWeekend, true));
+            cells.Add(new CalendarCell(i, isWeekend, true, isToday));
         }
 
         var remainingCells = cells.Count % 7;
@@ -68,16 +77,12 @@
             {
                 var nextDate = new DateTime(nextMonth.Year, nextMonth.Month, i);
                 var isWeekend = nextDate.DayOfWeek == DayOfWeek.Saturday || nextDate.DayOfWeek == DayOfWeek.Sunday;
+                var isToday = nextDate.Date == today;
 
-                cells.Add(new CalendarCell(i, isWeekend, false));
+                cells.Add(new CalendarCell(i, isWeekend, false, isToday));
             }
         }
 
         return cells;
-    }
-
-    protected override void OnInitialized()
-    {
-
     }
 }
